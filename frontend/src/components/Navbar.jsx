@@ -41,16 +41,22 @@ const Navbar = () => {
                   </a>
                 </li>
                 <li>
-                  <a className="dropdown-item" onClick={logout}>Logout</a>
+                  <a className="dropdown-item" onClick={logout}>
+                    Logout
+                  </a>
                 </li>
               </ul>
             </div>
-           
           </div>
         ) : (
-          <a className="btn btn-primary" href="/login">
-            Login
-          </a>
+          <div className="d-flex gap-2">
+            <a className="btn btn-primary" href="/login">
+              Login
+            </a>
+            <a className="btn btn-outline-success" href="/register">
+              Register
+            </a>
+          </div>
         )}
       </div>
     </nav>
