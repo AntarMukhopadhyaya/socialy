@@ -1,63 +1,87 @@
-import React from "react";
+
+import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const Navbar = () => {
   const { isAuthenticated, logout } = useAuth();
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div className="container-fluid">
-        <a className="navbar-brand" href="/">
+        <Link className="navbar-brand fw-bold" to="/">
           Socialy
-        </a>
-        {isAuthenticated ? (
-          <div className="d-flex">
-            <div className="dropdown ">
-              <a
-                href=""
-                className="d=flex align-items-center text-decoration-none dropdown-toggle"
-                id="userDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <img
-                  src="https://via.placeholder.com/150"
-                  alt="profile"
-                  className="rounded-circle"
-                  style={{ width: "30px" }}
-                />
-              </a>
-              <ul
-                className="dropdown-menu dropdown-menu-end z-1"
-                aria-labelledby="userDropDown"
-              >
-                <li>
-                  <a className="dropdown-item" href="/profile">
-                    Profile
-                  </a>
+        </Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto">
+            {isAuthenticated ? (
+              <li className="nav-item dropdown position-relative">
+                <a
+                  className="nav-link dropdown-toggle d-flex align-items-center"
+                  href="#"
+                  role="button"
+                  id="userDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <img
+                    src="https://placehold.co/400"
+                    alt="profile"
+                    className="rounded-circle me-2"
+                    style={{ width: "35px", height: "35px", objectFit: "cover" }}
+                  />
+                  <span>Account</span>
+                </a>
+                <ul
+                  className="dropdown-menu dropdown-menu-end shadow"
+                  aria-labelledby="userDropdown"
+                  style={{ zIndex: 1050 }}
+                >
+                  <li>
+                    <Link className="dropdown-item" to="/profile">
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className="dropdown-item" to="/settings">
+                      Settings
+                    </Link>
+                  </li>
+                  <li>
+                    <hr className="dropdown-divider" />
+                  </li>
+                  <li>
+                    <button className="dropdown-item" onClick={logout}>
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </li>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">
+                    Login
+                  </Link>
                 </li>
-                <li>
-                  <a className="dropdown-item" href="/settings">
-                    Settings
-                  </a>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/register">
+                    Register
+                  </Link>
                 </li>
-                <li>
-                  <a className="dropdown-item" onClick={logout}>
-                    Logout
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        ) : (
-          <div className="d-flex gap-2">
-            <a className="btn btn-primary" href="/login">
-              Login
-            </a>
-            <a className="btn btn-outline-success" href="/register">
-              Register
-            </a>
-          </div>
-        )}
+              </>
+            )}
+          </ul>
+        </div>
       </div>
     </nav>
   );

@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import Alert from "./Alert";
 import EmojiPicker from "emoji-picker-react";
-import {BsEmojiSmile} from "react-icons/bs";
+import { BsEmojiSmile } from "react-icons/bs";
 
 const CreatePostForm = ({ onPostCreated }) => {
   const [postContent, setPostContent] = useState("");
@@ -12,12 +12,14 @@ const CreatePostForm = ({ onPostCreated }) => {
   const { getUser } = useAuth();
   const [error, setError] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     if (getUser() === null) {
-      naviagte("/login");
+      navigate("/login");
+      return;
     }
     try {
       const response = await axios.post(
@@ -44,47 +46,63 @@ const CreatePostForm = ({ onPostCreated }) => {
       }
     } catch (err) {
       console.log(err.message);
+      setError("Failed to create post");
     } finally {
       setLoading(false);
       setPostContent("");
     }
   };
+
   const handleEmojiClick = (emojiObject) => {
-    setPostContent(prev => prev + emojiObject.emoji);
-  }
+    setPostContent((prev) => prev + emojiObject.emoji);
+  };
+
   return (
-    <div className="card mb-4">
+    <div className="card mb-4 shadow-sm">
       <div className="card-body">
+        <h5 className="card-title">Create a Post</h5>
         <Alert message={error} type="danger" onClose={() => setError("")} />
-        <textarea
-          className="form-control"
-          rows="3"
-          placeholder="Whats on your mind?"
-          value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
-        ></textarea>
-        <div className="mt-2 d-flex align-items-center justify-content-end">
-          <BsEmojiSmile  size={24} style={{cursor:"pointer"}} onClick={() => setShowEmojiPicker(!showEmojiPicker)}/>
-        </div>
-        {showEmojiPicker && (
-          <div style={{position: 'relative'}}>
-          <EmojiPicker
-            onEmojiClick={handleEmojiClick}
-            height={350}
-            disableSkinTonePicker={true}
-            disableSearchBar={true}
-            pickerStyle={{ position: 'absolute', bottom: '50px', zIndex: 1000 }}
-          />
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <textarea
+              className="form-control"
+              rows="3"
+              placeholder="What's on your mind?"
+              value={postContent}
+              onChange={(e) => setPostContent(e.target.value)}
+            ></textarea>
           </div>
-        )}
-        <button
-          className="btn btn-primary mt-3"
-          type="submit"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? "Loading..." : "Post"}
-        </button>
+          <div className="d-flex align-items-center mb-2">
+            <BsEmojiSmile
+              size={24}
+              style={{ cursor: "pointer" }}
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            />
+          </div>
+          <div className="position-relative">
+            {showEmojiPicker && (
+              <div className="emoji-picker position-absolute" style={{ zIndex: 1000 }}>
+                <EmojiPicker
+                  onEmojiClick={handleEmojiClick}
+                  height={350}
+                  disableSkinTonePicker={true}
+                  disableSearchBar={true}
+                />
+              </div>
+            )}
+          </div>
+          <button
+            className="btn btn-primary w-100"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            ) : (
+              "Post"
+            )}
+          </button>
+        </form>
       </div>
     </div>
   );
