@@ -1,11 +1,12 @@
+/* eslint-disable react/prop-types */
 import axios from "axios";
 import { FaPaperPlane } from "react-icons/fa";
 import { formatDistanceToNow } from "date-fns";
 import { useState, useEffect } from "react";
-import useAuth from "../hooks/useAuth";
+
 
 const CommentSection = ({ postId }) => {
-  const { getUser } = useAuth();
+
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   useEffect(() => {

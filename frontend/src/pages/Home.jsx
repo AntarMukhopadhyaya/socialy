@@ -1,39 +1,33 @@
-import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
+import { useEffect } from "react";
+
 import CreatePostForm from "../components/CreatePostForm";
 import PostCard from "../components/PostCard";
 import Sidebar from "../components/Sidebar";
-import api from "../api";
-import axios from "axios";
+
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPosts } from "../reducers/postReducer";
 
 const Home = () => {
-  const [posts, setPosts] = useState([]);
+  const dispatch = useDispatch();
+  const { posts, isLoading } = useSelector((state) => state.post);
   useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await axios.get("http://localhost:3000/api/posts");
-      setPosts(response.data);
-    }
-    fetchPosts();
-  },[]);
-  const addNewPost = (newPost) => {
-    setPosts((prevPosts) => [newPost, ...prevPosts]);
-  }
+    dispatch(fetchPosts());
+  }, [dispatch]);
   return (
     <main className="container mt-5">
       <div className="row mt-5">
         <div className="col-md-8">
-          <CreatePostForm onPostCreated={addNewPost} />
-            {posts.map((post) => (
+          <CreatePostForm />
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            posts.map((post) => (
               <PostCard
                 key={post._id}
-                id={post._id}
-                postedBy={post.postedBy}
-                date={post.createdAt}
-                content={post.content}
-                likesCount={post.likes.length}
+                post = {post}
               />
-            ))}
-        
+            ))
+          )}
         </div>
         <div className="col-md-4">
           <Sidebar />

@@ -1,49 +1,38 @@
-
 import useAuth from "../hooks/useAuth";
-import { useNavigate } from "react-router";
-import axios from "axios";
+
+
 import Alert from "./Alert";
 import EmojiPicker from "emoji-picker-react";
 import { BsEmojiSmile } from "react-icons/bs";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { addPost } from "../reducers/postReducer";
 
-const CreatePostForm = ({ onPostCreated }) => {
+const CreatePostForm = () => {
   const [postContent, setPostContent] = useState("");
   const [loading, setLoading] = useState(false);
   const { getUser } = useAuth();
   const [error, setError] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const navigate = useNavigate();
 
+  const dispatch = useDispatch();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    if (getUser() === null) {
-      navigate("/login");
-      return;
-    }
+
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/posts/create",
-        {
+      await dispatch(
+        addPost({
           content: postContent,
           image: "http://placekitten.com/200/300",
           postedBy: {
             _id: getUser().id,
             username: getUser().username,
           },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      if (response.status !== 201) {
-        setError("Something went wrong");
-        return;
-      } else {
-        onPostCreated(response.data);
-      }
+        })
+      ).unwrap();
+      console.log("Post created successfully");
+      setPostContent("");
     } catch (err) {
       console.log(err.message);
       setError("Failed to create post");
@@ -81,7 +70,10 @@ const CreatePostForm = ({ onPostCreated }) => {
           </div>
           <div className="position-relative">
             {showEmojiPicker && (
-              <div className="emoji-picker position-absolute" style={{ zIndex: 1000 }}>
+              <div
+                className="emoji-picker position-absolute"
+                style={{ zIndex: 1000 }}
+              >
                 <EmojiPicker
                   onEmojiClick={handleEmojiClick}
                   height={350}
@@ -97,7 +89,11 @@ const CreatePostForm = ({ onPostCreated }) => {
             disabled={loading}
           >
             {loading ? (
-              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
             ) : (
               "Post"
             )}

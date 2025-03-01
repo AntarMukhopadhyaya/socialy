@@ -3,7 +3,9 @@ import bcrypt from "bcrypt";
 const userSchema = new mongoose.Schema({
     firstName: { type: String, required:false},
     lastName: { type: String, required:false},
-    profileImage: { type: String, required:false},
+    profileImage: { type: String, required:false,default: "default.jpg"},
+    coverImage: { type: String, required:false,default: "https://placehold.co/350"},
+    bio: { type: String, required:false},
     username: { type: String, required:true,unique: true},
     email: { type: String, required:true,unique: true},
     password: { type: String, required:true},

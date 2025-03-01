@@ -5,6 +5,8 @@ import Navbar from "./components/Navbar";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Profile from "./pages/Profile";
+import UpdateProfile from "./pages/UpdateProfile";
 function App() {
   return (
     <>
@@ -17,6 +19,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+            <Route
+            path="/profile/update"
+            element={
+              <ProtectedRoute>
+                <UpdateProfile />
               </ProtectedRoute>
             }
           />

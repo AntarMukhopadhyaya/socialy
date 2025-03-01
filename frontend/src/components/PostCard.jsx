@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
 import {
   FaThumbsUp,
   FaComment,
@@ -6,65 +7,45 @@ import {
   FaPenNib,
   FaTrash,
 } from "react-icons/fa";
-import { formatDistanceToNow } from "date-fns"; // For social icons
-import useAuth from "../hooks/useAuth";
-import axios from "axios";
+import { formatDistanceToNow } from "date-fns";
 import CommentSection from "./CommentSection";
-const PostCard = ({ id, postedBy, date, content,likesCount}) => {
-  const { getUser } = useAuth();
-  const deletePost = async (id) => {
-    try {
-      const response = await axios.delete(
-        `http://localhost:3000/api/posts/delete/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      if (response.data.message === "Post deleted successfully") {
-        window.location.reload();
-      }
-    } catch (err) {
-      console.log(err.message);
-      return;
-    }
-  };
-  const [showComments, setShowComments] = useState(false);
-  const [likes, setLikes] = useState(likesCount);
-  const [likedByUser, setLikedByUser] = useState(false)
-  const likePost = async (id) => {
-    console.log("Hello World");
-    
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/api/posts/like/${id}`,
-    
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      setLikes(response.data.likesCount);
-      setLikedByUser(response.data.hasLiked);
+import { useDispatch } from "react-redux";
+import { deletePost, likePost } from "../reducers/postReducer";
+import useAuth from "../hooks/useAuth";
 
-      console.log(response.data);
-    } catch (err) {
-      console.log(err.message);
-    }
-  }
+const PostCard = ({ post }) => {
+  const [showComments, setShowComments] = useState(false);
+  console.log(post);
+
+  const { getUser } = useAuth();
+
+  const dispatch = useDispatch();
+  console.log(post.postedBy);
   return (
-    <div className="card mb-4">
+    <div className="card mb-4 shadow-sm">
       <div className="card-body">
-        <div className="d-flex justify-content-between">
-          <div>
-            <strong>{postedBy.username}</strong>{" "}
-            <small>
-              {formatDistanceToNow(new Date(date), { addSuffix: true })}
-            </small>
+        <div className="d-flex justify-content-between ">
+          <div className="d-flex justify-content-start align-items-center gap-2">
+            <div className="">
+              <img
+                src={
+                  "http://localhost:3000/uploads/" + post.postedBy.profileImage
+                }
+                alt="profile"
+                className="rounded-circle"
+                style={{ width: "30px", height: "30px", objectFit: "cover" }}
+              />
+            </div>
+            <div>
+              <strong>{post.postedBy.username}</strong>{" "}
+              <small>
+                {formatDistanceToNow(new Date(post.createdAt), {
+                  addSuffix: true,
+                })}
+              </small>
+            </div>
           </div>
-          {getUser().id === postedBy._id && (
+          {getUser().id === post.postedBy._id && (
             <div className="dropdown">
               <button
                 className="btn btn-outline-secondary btn-sm dropdown-toggle"
@@ -85,7 +66,7 @@ const PostCard = ({ id, postedBy, date, content,likesCount}) => {
                 <li>
                   <button
                     className="dropdown-item text-danger"
-                    onClick={() => deletePost(id)}
+                    onClick={() => dispatch(deletePost(post._id))}
                   >
                     <FaTrash /> Delete
                   </button>
@@ -94,20 +75,27 @@ const PostCard = ({ id, postedBy, date, content,likesCount}) => {
             </div>
           )}
         </div>
-        <p>{content}</p>
+        <p>{post.content}</p>
         <div className="d-flex justify-content-start">
-          <button className="btn btn-link btn-sm" onClick={() => likePost(id)}>
-            
-            <FaThumbsUp color={likedByUser ? "blue" : "black"}  /> {likes}
+          <button
+            className="btn btn-link btn-sm"
+            onClick={() => dispatch(likePost(post._id))}
+          >
+            <FaThumbsUp color={post.hasLiked ? "blue" : "black"} />{" "}
+            {post.likesCount}
           </button>
-          <button className="btn btn-link btn-sm" onClick={() => setShowComments(!showComments)}>
-            <FaComment /> Comment
+          <button
+            className="btn btn-sm"
+            onClick={() => setShowComments(!showComments)}
+          >
+            <FaComment color={showComments ? "blue" : "black"} />{" "}
+            {post.comments.length}
           </button>
           <button className="btn btn-link btn-sm">
             <FaShareAlt /> Share
           </button>{" "}
         </div>
-        {showComments && <CommentSection postId={id} />}
+        {showComments && <CommentSection postId={post._id} />}
       </div>
     </div>
   );
