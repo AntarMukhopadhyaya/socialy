@@ -1,6 +1,6 @@
 import express from "express";
 
-import { createPost, getPosts,deletePost,likePost} from "../controllers/postController.js";
+import { createPost, getPosts,deletePost,likePost,updatePost,rewritePost} from "../controllers/postController.js";
 import authMiddleware from "../middlewares/auth.js";
 
 
@@ -10,5 +10,6 @@ postRouter.post("/create",authMiddleware, createPost);
 postRouter.delete("/delete/:id",authMiddleware, deletePost);
 postRouter.get("/",authMiddleware,getPosts);
 postRouter.get("/like/:postId",authMiddleware,likePost);
-
+postRouter.put("/edit/:id",authMiddleware,updatePost);
+postRouter.post("/rewrite",authMiddleware,rewritePost);
 export default postRouter;

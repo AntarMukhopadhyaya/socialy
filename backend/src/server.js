@@ -14,6 +14,7 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev")); // For logging into the terminal
 // Connecting to MongoDB
 
