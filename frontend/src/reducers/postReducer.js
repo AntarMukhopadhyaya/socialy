@@ -64,6 +64,25 @@ export const addPost = createAsyncThunk(
     }
   }
 );
+export const updatePost = createAsyncThunk(
+  "posts/updatePost",
+  async ({ postId, postData }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/api/posts/edit/${postId}`,
+        postData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 // export const addPost = createAsyncThunk("http://localhost:3000/api/posts/create",async(postData,))
 const initialState = {
@@ -101,6 +120,17 @@ const postSlice = createSlice({
         state.posts = state.posts.filter((post) => post._id !== action.payload);
       })
       .addCase(deletePost.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(updatePost.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updatePost.fulfilled, (state, action) => {
+        state.isLoading = false;
+      
+      })
+      .addCase(updatePost.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload;
       })
       .addCase(likePost.fulfilled, (state, action) => {
