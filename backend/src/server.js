@@ -8,6 +8,7 @@ import morgan from "morgan";
 import postRouter from "./routes/postRoute.js";
 import commentRouter from "./routes/commentRoute.js";
 import path from "path";
+import searchRouter from "./routes/searchRoute.js";
 
 const app = express();
 const port = 3000;
@@ -30,6 +31,7 @@ app.use("/uploads", express.static(path.join(path.resolve(), "/uploads")));
 app.use("/api/users", userRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/comments", commentRouter);
+app.use("/api/search", searchRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port http://localhost:${port}`);
