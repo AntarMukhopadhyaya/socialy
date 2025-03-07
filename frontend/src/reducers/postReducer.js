@@ -1,28 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import api from "../api";
 
-export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
-  const response = await axios.get("http://localhost:3000/api/posts", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
+export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => { 
+  const response = await api.get("posts");
   return response.data;
+ 
 });
 
 export const deletePost = createAsyncThunk(
   "posts/deletePost",
   async (postId, { rejectWithValue }) => {
     try {
-      await axios.delete(`http://localhost:3000/api/posts/delete/${postId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      await api.delete(`posts/delete/${postId}`);
       return postId;
-    } catch (error) {
+    }catch(error){
       return rejectWithValue(error.response.data);
     }
+   
   }
 );
 export const likePost = createAsyncThunk(
@@ -135,6 +130,7 @@ const postSlice = createSlice({
       })
       .addCase(likePost.fulfilled, (state, action) => {
         const { postId, likesCount, hasLiked } = action.payload;
+        
         const post = state.posts.find((p) => p._id === postId);
         if (post) {
           post.likesCount = likesCount;

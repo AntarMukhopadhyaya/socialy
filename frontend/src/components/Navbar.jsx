@@ -19,7 +19,7 @@ const Navbar = () => {
         <Link className="navbar-brand fw-bold" to="/">
           Socialy
         </Link>
-        <div className="collapse navbar-collapse ">
+        <div className="flex-grow-1 px-3 ">
          <SearchBar />
         </div>
 

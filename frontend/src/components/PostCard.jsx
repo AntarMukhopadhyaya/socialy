@@ -10,8 +10,14 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import CommentSection from "./CommentSection";
 import { useDispatch } from "react-redux";
-import { deletePost, fetchPosts, likePost, updatePost } from "../reducers/postReducer";
+import {
+  deletePost,
+  fetchPosts,
+  likePost,
+  updatePost,
+} from "../reducers/postReducer";
 import useAuth from "../hooks/useAuth";
+import { Link } from "react-router";
 
 const PostCard = ({ post }) => {
   const [showComments, setShowComments] = useState(false);
@@ -24,8 +30,9 @@ const PostCard = ({ post }) => {
     setEditedContent(post.content);
   };
   const handleUpdate = () => {
-    dispatch(updatePost({ postId: post._id, postData: { content: editedContent } }))
-      .then(() => dispatch(fetchPosts())); 
+    dispatch(
+      updatePost({ postId: post._id, postData: { content: editedContent } })
+    ).then(() => dispatch(fetchPosts()));
     setShowEditModal(false);
   };
   return (
@@ -44,7 +51,14 @@ const PostCard = ({ post }) => {
               />
             </div>
             <div>
-              <strong>{post.postedBy.username}</strong>{" "}
+              <Link
+                to={`/profile/${post.postedBy._id}`}
+                className="cursor-pointer "
+                style={{ textDecoration: "none" }}
+              >
+                <strong>{post.postedBy.username}</strong>{" "}
+              </Link>
+
               <small>
                 {formatDistanceToNow(new Date(post.createdAt), {
                   addSuffix: true,

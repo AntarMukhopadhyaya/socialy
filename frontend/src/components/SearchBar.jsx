@@ -1,10 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { debounce } from "lodash";
+import { FaSearch } from "react-icons/fa";
+import { Link } from "react-router";
+
 const SearchBar = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState({ users: [], posts: [] });
   const [loading, setLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
   // Fetch Search Results
   const fetchSearchResult = useCallback(
@@ -12,6 +16,7 @@ const SearchBar = () => {
       if (!searchTerm) {
         setResults({ users: [], posts: [] });
         setLoading(false);
+        setShowResults(false);
         return;
       }
       setLoading(true);
@@ -25,6 +30,7 @@ const SearchBar = () => {
           }
         );
         setResults(data);
+        setShowResults(true);
       } catch (error) {
         console.error(error);
       } finally {
@@ -33,57 +39,96 @@ const SearchBar = () => {
     }, 1000),
     []
   );
+
   useEffect(() => {
     fetchSearchResult(query);
   }, [query, fetchSearchResult]);
 
   return (
-    <div className="container">
+    <div className="position-relative">
       {/* Search Input */}
-      <div className="mb-3 d-flex align-items-center">
+      <div className="input-group">
+        <span className="input-group-text bg-white border-end-0">
+          <FaSearch />
+        </span>
+
         <input
           type="text"
-          className="form-control"
+          className="form-control border-start-0 rounded-end form-control-lg rounded-full"
           placeholder="Search users or posts..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setShowResults(true)}
+          onBlur={() => setTimeout(() => setShowResults(false), 200)} // Delay to allow clicking results
         />
       </div>
+      {/* Search Results Dropdown */}
+      {showResults && (
+        <div
+          className="position-absolute bg-white border rounded shadow p-2"
+          style={{
+            width: "100%",
+            maxHeight: "300px",
+            overflowY: "auto",
+            zIndex: 1000,
+          }}
+        >
+          {loading && <p>Loading...</p>}
 
-      {/* Loading Indicator */}
-      {loading && <p>Loading...</p>}
-
-      {/* Display Users */}
-      {results.users.length > 0 && (
-        <div className="mb-4">
-          <h5>Users</h5>
-          {results.users.map((user) => (
-            <div key={user._id} className="card p-2 mb-2 shadow-sm">
-              <img
-                src={user.profilePicture || "https://via.placeholder.com/50"}
-                alt="Profile"
-                className="rounded-circle"
-                width="50"
-                height="50"
-              />
-              <span className="ms-2 fw-bold">{user.username}</span>
-              <span className="text-muted ms-2">({user.email})</span>
+          {/* Display Users */}
+          {results.users.length > 0 && (
+            <div>
+              <h6 className="text-muted">Users</h6>
+              {results.users.map((user) => (
+                <div
+                  key={user._id}
+                  className="d-flex align-items-center p-2 border-bottom"
+                >
+                  <img
+                    src={`http://localhost:3000/uploads/${user.profileImage}`}
+                    alt="Profile"
+                    className="rounded-circle"
+                    width="40"
+                    height="40"
+                  />
+                  <Link
+                    to={`/profile/${user._id}`}
+                    className="text-decoration-none text-dark"
+                  >
+                    <div className="ms-2">
+                      <span className="fw-bold">{user.username}</span>
+                      <small className="text-muted d-block">{user.bio}</small>
+                    </div>
+                  </Link>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
+          )}
 
-      {/* Display Posts */}
-      {results.posts.length > 0 && (
-        <div>
-          <h5>Posts</h5>
-          {results.posts.map((post) => (
-            <div key={post._id} className="card p-3 mb-3 shadow-sm">
-              <h6>{post.title}</h6>
-              <p>{post.content.substring(0, 100)}...</p>
-              <span className="text-muted">By {post.postedBy.username}</span>
+          {/* Display Posts */}
+          {results.posts.length > 0 && (
+            <div>
+              <h6 className="text-muted mt-2">Posts</h6>
+              {results.posts.map((post) => (
+                <div key={post._id} className="p-2 border-bottom">
+                  <h6 className="mb-1">{post.title}</h6>
+                  <p className="text-muted">
+                    {post.content.substring(0, 80)}...
+                  </p>
+                  <small className="text-muted">
+                    By {post.postedBy.username}
+                  </small>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+
+          {/* No Results */}
+          {results.users.length === 0 &&
+            results.posts.length === 0 &&
+            !loading && (
+              <p className="text-muted text-center">No results found</p>
+            )}
         </div>
       )}
     </div>

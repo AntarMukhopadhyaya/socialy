@@ -1,5 +1,6 @@
 import {createSlice,createAsyncThunk} from '@reduxjs/toolkit';
 import axios from 'axios';
+import api from '../api';
 
 export const login = createAsyncThunk("auth/login",async(formData, {rejectedWithValue}) => {
     try {
@@ -10,6 +11,8 @@ export const login = createAsyncThunk("auth/login",async(formData, {rejectedWith
         return rejectedWithValue(error.response.data);
     }
 });
+
+
 
 const authSlice = createSlice({
     name: "auth",
