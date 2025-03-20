@@ -1,17 +1,12 @@
 import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import { useState } from "react";
+
 import SearchBar from "./SearchBar";
 
 const Navbar = () => {
   const { isAuthenticated, logout, getUser } = useAuth();
-  const [search, setSearch] = useState("");
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log("Searching for:", search);
-    // Implement search functionality here
-  };
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm">

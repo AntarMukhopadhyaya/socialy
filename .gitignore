@@ -48,5 +48,6 @@ uploads/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
-# Ignore environment files
-**/.env
+.env
+.env.local
+backend/.env

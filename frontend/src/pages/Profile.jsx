@@ -20,6 +20,8 @@ const Profile = () => {
   const handleFollow = () => {
     dispatch(toggleFollow(id));
   };
+
+  console.log(userProfile)
   
   return (
     <div className="container mt-4">
@@ -118,8 +120,8 @@ const Profile = () => {
               <FaUserFriends className="me-2" /> Following
             </h4>
             <div className="list-group shadow-sm rounded">
-              {userProfile?.following?.length > 0 ? (
-                userProfile.following.map((user, index) => (
+              {userProfile?.followers?.length > 0 ? (
+                userProfile.followers.map((user, index) => (
                   <a
                     key={index}
                     href={`/profile/${user._id}`}

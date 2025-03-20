@@ -9,6 +9,7 @@ import postRouter from "./routes/postRoute.js";
 import commentRouter from "./routes/commentRoute.js";
 import path from "path";
 import searchRouter from "./routes/searchRoute.js";
+import suggestionRouter from "./routes/suggestionRoute.js";
 
 const app = express();
 const port = 3000;
@@ -32,6 +33,7 @@ app.use("/api/users", userRouter);
 app.use("/api/posts", postRouter);
 app.use("/api/comments", commentRouter);
 app.use("/api/search", searchRouter);
+app.use("/api/suggestions", suggestionRouter);
 
 app.listen(port, () => {
   console.log(`Server is running on port http://localhost:${port}`);

@@ -54,12 +54,12 @@ const profileSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(toggleFollow.fulfilled, (state) => {
+      .addCase(toggleFollow.fulfilled, (state,action) => {
         if (state.data) {
           state.data.isFollowing = !state.data.isFollowing;
-          state.data.following = state.data.isFollowing
-            ? [...state.data.following, state.data._id]
-            : state.data.following.filter(
+          state.data.followers = state.data.isFollowing
+            ? [...state.data.followers, state.data._id]
+            : state.data.followers.filter(
                 (userId) => userId !== state.data._id
               );
         }

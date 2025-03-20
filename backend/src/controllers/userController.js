@@ -61,6 +61,10 @@ export const profile = async (req, res) => {
       .select("-password")
       .populate("following", "_id username profileImage");
 
+    const followers = await Follower.find({ followingId: userId })
+      .populate("followerId", "_id username profileImage")
+      .select("followerId");
+      console.log(followers)
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -80,14 +84,17 @@ export const profile = async (req, res) => {
         : false,
     }));
 
-    // Fix: Correct isFollowing logic
-    const isFollowing = req.user
-      ? user.following.some((followedUser) => followedUser._id.toString() === req.user.id)
-      : false;
+    const isFollowing = !!(await Follower.findOne({
+      followerId: req.user.id,
+      followingId: userId,
+    }));
+
+    console.log(isFollowing);
 
     res.status(200).json({
       ...user.toObject(),
       posts: postsWithLikes,
+      followers: followers.map((follower) => follower.followerId),
       isFollowing,
       isMe: req.user ? req.user.id === userId : false,
     });
@@ -154,6 +161,7 @@ export const followUser = async (req, res) => {
       console.log("User followed successfully");
       return res.status(201).json({
         message: "User followed successfully",
+        userId: userId,
       });
     }
   } catch (error) {
