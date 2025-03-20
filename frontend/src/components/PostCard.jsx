@@ -35,6 +35,8 @@ const PostCard = ({ post }) => {
     ).then(() => dispatch(fetchPosts()));
     setShowEditModal(false);
   };
+  console.log(post);
+  
   return (
     <div className="card mb-4 shadow-sm">
       <div className="card-body">
@@ -96,6 +98,11 @@ const PostCard = ({ post }) => {
             </div>
           )}
         </div>
+        {post.image && (
+          <div className="text-center mb-3">
+            <img src={`http://localhost:3000/uploads/${post.image}`} alt="post image" className="img-fluid rounded" style={{maxHeight: "400px", objectFit: "cover"}} />
+          </div>
+        )}
         <p>{post.content}</p>
         <div className="d-flex justify-content-start">
           <button

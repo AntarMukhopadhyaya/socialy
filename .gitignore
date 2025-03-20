@@ -43,8 +43,10 @@ Thumbs.db
 
 # MongoDB data
 /data/db/
-
+uploads/
 # Other dependencies
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+# Ignore environment files
+**/.env

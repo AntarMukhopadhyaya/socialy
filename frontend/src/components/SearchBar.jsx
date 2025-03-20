@@ -48,24 +48,26 @@ const SearchBar = () => {
     <div className="position-relative">
       {/* Search Input */}
       <div className="input-group">
-        <span className="input-group-text bg-white border-end-0">
+        <span className="input-group-text bg-dark text-cyan border-neon">
           <FaSearch />
         </span>
 
         <input
           type="text"
-          className="form-control border-start-0 rounded-end form-control-lg rounded-full"
+          className="form-control bg-dark text-cyan border-neon rounded-full"
           placeholder="Search users or posts..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setShowResults(true)}
-          onBlur={() => setTimeout(() => setShowResults(false), 200)} // Delay to allow clicking results
+          onBlur={() => setTimeout(() => setShowResults(false), 200)} 
+          
         />
       </div>
+
       {/* Search Results Dropdown */}
       {showResults && (
         <div
-          className="position-absolute bg-white border rounded shadow p-2"
+          className="position-absolute bg-dark border-neon shadow p-2"
           style={{
             width: "100%",
             maxHeight: "300px",
@@ -73,27 +75,27 @@ const SearchBar = () => {
             zIndex: 1000,
           }}
         >
-          {loading && <p>Loading...</p>}
+          {loading && <p className="text-cyan">Loading...</p>}
 
           {/* Display Users */}
           {results.users.length > 0 && (
             <div>
-              <h6 className="text-muted">Users</h6>
+              <h6 className="text-neon">Users</h6>
               {results.users.map((user) => (
                 <div
                   key={user._id}
-                  className="d-flex align-items-center p-2 border-bottom"
+                  className="d-flex align-items-center p-2 border-bottom border-neon-hover"
                 >
                   <img
                     src={`http://localhost:3000/uploads/${user.profileImage}`}
                     alt="Profile"
-                    className="rounded-circle"
+                    className="rounded-circle border-neon"
                     width="40"
                     height="40"
                   />
                   <Link
                     to={`/profile/${user._id}`}
-                    className="text-decoration-none text-dark"
+                    className="text-decoration-none text-neon-hover"
                   >
                     <div className="ms-2">
                       <span className="fw-bold">{user.username}</span>
@@ -108,14 +110,14 @@ const SearchBar = () => {
           {/* Display Posts */}
           {results.posts.length > 0 && (
             <div>
-              <h6 className="text-muted mt-2">Posts</h6>
+              <h6 className="text-neon mt-2">Posts</h6>
               {results.posts.map((post) => (
-                <div key={post._id} className="p-2 border-bottom">
+                <div key={post._id} className="p-2 border-bottom border-neon-hover">
                   <h6 className="mb-1">{post.title}</h6>
                   <p className="text-muted">
                     {post.content.substring(0, 80)}...
                   </p>
-                  <small className="text-muted">
+                  <small className="text-cyan">
                     By {post.postedBy.username}
                   </small>
                 </div>

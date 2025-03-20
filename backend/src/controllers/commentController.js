@@ -10,7 +10,7 @@ export const addComment = async (req, res) => {
     const comment = new Comment({ text, commentedBy: userId, post: postId });
     await comment.save();
     await Post.findByIdAndUpdate(postId, { $push: { comments: comment._id } });
-    const populatedComment = await Comment.findById(comment._id).populate("commentedBy", "username");
+    const populatedComment = await Comment.findById(comment._id).populate("commentedBy", "username profileImage");
     res.status(201).json(populatedComment);
   } catch (error) {
     console.error(error);
@@ -22,7 +22,7 @@ export const getComments = async (req, res) => {
   try {
     const comments = await Comment.find({ post: postId }).populate(
       "commentedBy",
-      "username"
+      "username profileImage"
     );
     res.status(200).json(comments);
   } catch (error) {
@@ -41,3 +41,17 @@ export const deleteComment = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+export const updateComment = async(req,res) => {
+  const {commentId} = req.params;
+  const {text} = req.body;
+  if(!text)
+    return res.status(400).json({message: "Comment text is required"});
+  try {
+    const comment = await Comment.findByIdAndUpdate(commentId, {text}, {new: true}).populate("commentedBy", "username profileImage");
+    res.status(200).json(comment);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: "Server error"});
+  }
+
+}

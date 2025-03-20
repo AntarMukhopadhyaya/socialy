@@ -54,23 +54,49 @@ export const verify = async (req, res) => {
 };
 export const profile = async (req, res) => {
   try {
-    const id = req.params.userId;
-    const user = await User.findById(id).select("-password");
-    const posts = await Post.find({postedBy: id}).populate("postedBy", "username profileImage");
+    const { userId } = req.params;
+
+    // Fetch user and populate "following" with only necessary fields
+    const user = await User.findById(userId)
+      .select("-password")
+      .populate("following", "_id username profileImage");
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(201).json({
+
+    // Fetch posts with necessary fields and populate related data
+    const posts = await Post.find({ postedBy: userId })
+      .populate("postedBy", "username profileImage")
+      .populate("comments.commentedBy", "username")
+      .populate("likes");
+
+    // Transform posts to include likesCount and hasLiked
+    const postsWithLikes = posts.map((post) => ({
+      ...post.toObject(),
+      likesCount: post.likes.length,
+      hasLiked: req.user
+        ? post.likes.some((like) => like.userId.toString() === req.user.id)
+        : false,
+    }));
+
+    // Fix: Correct isFollowing logic
+    const isFollowing = req.user
+      ? user.following.some((followedUser) => followedUser._id.toString() === req.user.id)
+      : false;
+
+    res.status(200).json({
       ...user.toObject(),
-      posts,
-      isFollowing: req.user ? user.following.includes(id) : false,
-      isMe: req.user ? req.user.id === id : false,
+      posts: postsWithLikes,
+      isFollowing,
+      isMe: req.user ? req.user.id === userId : false,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Profile Fetch Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -112,6 +138,8 @@ export const followUser = async (req, res) => {
       await User.findByIdAndUpdate(currentUser, {
         $pull: { following: userId },
       });
+      console.log("User unfollowed successfully");
+
       return res.status(200).json({
         message: "User unfollowed successfully",
       });
@@ -123,6 +151,7 @@ export const followUser = async (req, res) => {
       await User.findByIdAndUpdate(currentUser, {
         $push: { following: userId },
       });
+      console.log("User followed successfully");
       return res.status(201).json({
         message: "User followed successfully",
       });
