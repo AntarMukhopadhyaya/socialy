@@ -106,20 +106,20 @@ const PostCard = ({ post }) => {
         <p>{post.content}</p>
         <div className="d-flex justify-content-start">
           <button
-            className="btn btn-link btn-sm"
+            className="btn btn-link btn-md"
             onClick={() => dispatch(likePost(post._id))}
           >
             <FaThumbsUp color={post.hasLiked ? "blue" : "black"} />{" "}
             {post.likesCount}
           </button>
           <button
-            className="btn btn-sm"
+            className="btn btn-md"
             onClick={() => setShowComments(!showComments)}
           >
             <FaComment color={showComments ? "blue" : "black"} />{" "}
             {post.comments.length}
           </button>
-          <button className="btn btn-link btn-sm">
+          <button className="btn btn-link btn-md">
             <FaShareAlt /> Share
           </button>{" "}
         </div>

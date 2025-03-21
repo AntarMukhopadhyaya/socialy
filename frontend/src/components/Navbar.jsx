@@ -15,7 +15,10 @@ const Navbar = () => {
           Socialy
         </Link>
         <div className="flex-grow-1 px-3 ">
+          {isAuthenticated && (
          <SearchBar />
+
+          )}
         </div>
 
 
@@ -65,7 +68,7 @@ const Navbar = () => {
                   style={{ zIndex: 1050 }}
                 >
                   <li>
-                    <Link className="dropdown-item" to="/profile">
+                    <Link className="dropdown-item" to={`/profile/${getUser().id}`}>
                       Profile
                     </Link>
                   </li>

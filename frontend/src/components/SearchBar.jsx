@@ -48,13 +48,13 @@ const SearchBar = () => {
     <div className="position-relative">
       {/* Search Input */}
       <div className="input-group">
-        <span className="input-group-text bg-dark text-cyan border-neon">
+        <span className="input-group-text">
           <FaSearch />
         </span>
 
         <input
           type="text"
-          className="form-control bg-dark text-cyan border-neon rounded-full"
+          className="form-control  rounded-full"
           placeholder="Search users or posts..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -67,7 +67,7 @@ const SearchBar = () => {
       {/* Search Results Dropdown */}
       {showResults && (
         <div
-          className="position-absolute bg-dark border-neon shadow p-2"
+          className="position-absolute shadow p-2"
           style={{
             width: "100%",
             maxHeight: "300px",

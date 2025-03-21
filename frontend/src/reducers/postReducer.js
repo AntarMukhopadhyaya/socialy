@@ -43,6 +43,7 @@ export const likePost = createAsyncThunk(
 export const addPost = createAsyncThunk(
   "posts/addPost",
   async (postData, { rejectWithValue }) => {
+    console.log(postData)
     try {
       const response = await axios.post(
         "http://localhost:3000/api/posts/create",

@@ -19,6 +19,7 @@ const CreatePostForm = () => {
   const [preview, setPreview] = useState(null);
   const [image, setImage] = useState(null);
   const dispatch = useDispatch();
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -26,40 +27,72 @@ const CreatePostForm = () => {
       setPreview(URL.createObjectURL(file));
     }
   };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+
+  //   let imageUrl = null;
+
+
+
+
+  //   try {
+  //     await dispatch(
+  //       addPost({
+  //         content: postContent,
+  //         image: imageUrl || "http://placekitten.com/200/300",
+  //         postedBy: {
+  //           _id: getUser().id,
+  //           username: getUser().username,
+  //         },
+  //       })
+  //     ).unwrap();
+  //     console.log("Post created successfully");
+  //     setPostContent("");
+  //     setImage(null);
+  //     setPreview(null);
+  //   } catch (err) {
+  //     console.log(err.message);
+  //     setError("Failed to create post");
+  //   } finally {
+  //     setLoading(false);
+  //     setPostContent("");
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    const formData = new FormData();
+    formData.append("content", postContent);
+    if (image) formData.append("image", image);
+    formData.append("username", getUser().username);
+    formData.append("userId", getUser().id);
+   
+
     try {
-      await dispatch(
-        addPost({
-          content: postContent,
-          image: "http://placekitten.com/200/300",
-          postedBy: {
-            _id: getUser().id,
-            username: getUser().username,
-          },
-        })
-      ).unwrap();
+      await dispatch(addPost(formData)).unwrap();
       console.log("Post created successfully");
       setPostContent("");
+      setImage(null);
+      setPreview(null);
     } catch (err) {
       console.log(err.message);
       setError("Failed to create post");
     } finally {
       setLoading(false);
-      setPostContent("");
     }
   };
 
   const handleEmojiClick = (emojiObject) => {
     setPostContent((prev) => prev + emojiObject.emoji);
   };
-  const rewritePostWithAI = async (content) => {
-    console.log(content);
 
+  const rewritePostWithAI = async (content) => {
     if (!content.trim()) return content;
     setAiLoading(true);
+
     try {
       const response = await axios.post(
         "http://localhost:3000/api/posts/rewrite",
@@ -106,7 +139,7 @@ const CreatePostForm = () => {
 
             <button
               type="button"
-              className="btn btn-outline-secondary  "
+              className="btn btn-outline-secondary"
               disabled={AiLoading}
               onClick={() => rewritePostWithAI(postContent)}
             >
@@ -118,7 +151,8 @@ const CreatePostForm = () => {
                 <FaMagic style={{ cursor: "pointer" }} size={24} />
               )}
             </button>
-            <button className="btn btn-outline-warning" type="button">
+
+            <label className="btn btn-outline-warning">
               <FaImages size={24} style={{ cursor: "pointer" }} />
               <input
                 type="file"
@@ -126,8 +160,9 @@ const CreatePostForm = () => {
                 onChange={handleImageChange}
                 style={{ display: "none" }}
               />
-            </button>
+            </label>
           </div>
+
           {preview && (
             <div className="mb-3">
               <img
@@ -138,32 +173,21 @@ const CreatePostForm = () => {
               />
             </div>
           )}
-          <div className="position-relative">
-            {showEmojiPicker && (
-              <div
-                className="emoji-picker position-absolute"
-                style={{ zIndex: 1000 }}
-              >
-                <EmojiPicker
-                  onEmojiClick={handleEmojiClick}
-                  height={350}
-                  disableSkinTonePicker={true}
-                  disableSearchBar={true}
-                />
-              </div>
-            )}
-          </div>
-          <button
-            className="btn btn-primary w-100"
-            type="submit"
-            disabled={loading}
-          >
+
+          {showEmojiPicker && (
+            <div className="emoji-picker position-absolute" style={{ zIndex: 1000 }}>
+              <EmojiPicker
+                onEmojiClick={handleEmojiClick}
+                height={350}
+                disableSkinTonePicker={true}
+                disableSearchBar={true}
+              />
+            </div>
+          )}
+
+          <button className="btn btn-primary w-100" type="submit" disabled={loading}>
             {loading ? (
-              <span
-                className="spinner-border spinner-border-sm"
-                role="status"
-                aria-hidden="true"
-              ></span>
+              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             ) : (
               "Post"
             )}

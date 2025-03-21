@@ -4,15 +4,23 @@ import Likes from "../models/Likes.js";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 export const createPost = async (req, res) => {
-  const { content, postedBy, image } = req.body;
+  const { content, userId,username } = req.body;
+  console.log(req.body);
+ 
+  let postedBy = {
+    _id: userId,
+    username: username,
+  };
+  
   try {
-    const post = new Post({ content, postedBy, image });
+    const post = new Post({ content,postedBy , image: req.file  ?  req.file.filename : null});
     await post.save();
     const populatedPost = await Post.findById(post._id)
       .populate("postedBy", "username profileImage")
       .exec();
     res.status(201).json(populatedPost);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -22,7 +30,7 @@ export const getPosts = async (req, res) => {
     const posts = await Post.find()
       .populate("postedBy", "username profileImage ")
       .populate("comments.commentedBy", "username")
-      .populate("likes");
+      .populate("likes").sort({ createdAt: -1 });
 
     const postsWithLikes = posts.map((post) => ({
       ...post.toObject(),
