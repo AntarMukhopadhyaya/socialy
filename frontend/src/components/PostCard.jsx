@@ -125,9 +125,9 @@ const PostCard = ({ post }) => {
             <FaComment color={showComments ? "blue" : "black"} />{" "}
             {post.comments.length}
           </button>
-          <button className="btn btn-link btn-md">
+          {/* <button className="btn btn-link btn-md">
             <FaShareAlt /> Share
-          </button>{" "}
+          </button>{" "} */}
         </div>
         {showComments && <CommentSection postId={post._id} comments={post.comments} />}
       </div>
