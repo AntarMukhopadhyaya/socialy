@@ -9,7 +9,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm position-relative">
-      <div className="container-fluid">
+      <div className="container-fluid ">
         <Link className="navbar-brand fw-bold" to="/">
           Socialy
         </Link>
@@ -73,11 +73,7 @@ const Navbar = () => {
                         Profile
                       </Link>
                     </li>
-                    <li>
-                      <Link className="dropdown-item" to="/settings">
-                        Settings
-                      </Link>
-                    </li>
+                    
                     <li>
                       <hr className="dropdown-divider" />
                     </li>

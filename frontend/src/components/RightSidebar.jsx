@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import api from "../api";
 import { Link } from "react-router";
 
@@ -52,6 +52,13 @@ const RightSidebar = () => {
                     >
                       {follower.followerId.username}
                     </Link>
+                    {follower.followerId.bio && (
+                        <p className="text-muted mb-0" style={{ fontSize: "12px" }}>
+                          {follower.followerId.bio.length > 30
+                            ? `${follower.followerId.bio.slice(0, 30)}...`
+                            : follower.followerId.bio}
+                        </p>
+                      )}
                   </div>
                 </li>
               ))}
