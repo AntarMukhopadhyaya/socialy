@@ -35,8 +35,8 @@ const PostCard = ({ post }) => {
     ).then(() => dispatch(fetchPosts()));
     setShowEditModal(false);
   };
-  console.log(post);
-  
+  console.log(post)
+
   return (
     <div className="card mb-4 shadow-sm">
       <div className="card-body">
@@ -100,7 +100,13 @@ const PostCard = ({ post }) => {
         </div>
         {post.image && (
           <div className="text-center mb-3">
-            <img src={`http://localhost:3000/uploads/${post.image}`} alt="post image" className="img-fluid rounded" style={{maxHeight: "400px", objectFit: "cover"}} />
+
+            <img
+              src={`http://localhost:3000/uploads/${post.image}`}
+              alt="post image"
+              className="img-fluid rounded"
+              style={{ maxHeight: "400px", objectFit: "cover" }}
+            />
           </div>
         )}
         <p>{post.content}</p>
@@ -123,7 +129,7 @@ const PostCard = ({ post }) => {
             <FaShareAlt /> Share
           </button>{" "}
         </div>
-        {showComments && <CommentSection postId={post._id} />}
+        {showComments && <CommentSection postId={post._id} comments={post.comments} />}
       </div>
 
       <div

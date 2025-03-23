@@ -1,50 +1,82 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
+
 import { FaEdit, FaPaperPlane, FaTrash } from "react-icons/fa";
 import { formatDistanceToNow } from "date-fns";
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  deleteComment,
-  fetchComments,
-  postComment,
-  updateComment,
-} from "../reducers/commentReducer";
 import useAuth from "../hooks/useAuth";
+import api from "../api";
 
-const CommentSection = ({ postId }) => {
-  const { comments, loading } = useSelector((state) => state.comments);
+const CommentSection = ({ postId, comments: initialComments }) => {
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(true);
+    setComments(initialComments);
+    setLoading(false);
+  }, [postId, initialComments]);
+
   const [newComment, setNewComment] = useState("");
-  const dispatch = useDispatch();
+
   const [editCommentId, setEditCommentId] = useState(null);
   const [editText, setEditText] = useState("");
   const { getUser } = useAuth();
-  useEffect(() => {
-    dispatch(fetchComments(postId));
-  }, [postId, dispatch]);
 
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (!newComment.trim()) return;
-    console.log(postId, newComment);
-    dispatch(postComment({ postId, text: newComment }));
-    setNewComment("");
+
+    try {
+      const response = await api.post(`comments/${postId}`, {
+        text: newComment,
+      });
+      setComments((prev) => [...prev, response.data]);
+    } catch (error) {
+      console.error("Error posting comment:", error);
+    } finally {
+      setNewComment("");
+      setLoading(false);
+    }
   };
   const handleEditComment = (commentId, text) => {
     console.log(commentId, text);
-    
+
     setEditCommentId(commentId);
     setEditText(text);
   };
-  const handleUpdateComment = () => {
-    dispatch(updateComment({ commentId: editCommentId, text: editText }));
-    setEditText("");
-    setEditCommentId(null);
+  const handleUpdateComment = async () => {
+    setLoading(true);
+    try {
+      await api.put(`comments/update/${editCommentId}`, { text: editText });
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment._id === editCommentId
+            ? { ...comment, text: editText }
+            : comment
+        )
+      );
+    } catch (error) {
+      console.error("Error updating comment:", error);
+    } finally {
+      setLoading(false);
+      setEditText("");
+      setEditCommentId(null);
+    }
+  };
+  const handleDeleteComment = async (commentId) => {
+    setLoading(true);
+    try {
+      await api.delete(`comments/delete/${commentId}`);
+      setComments((prev) =>
+        prev.filter((comment) => comment._id !== commentId)
+      );
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading || !comments) {
-    return <p>Loading...</p>;
-  }
   return (
     <div className="mt-3">
       <h6 className="text-muted">Comments</h6>
@@ -61,6 +93,7 @@ const CommentSection = ({ postId }) => {
         </button>
       </form>
       <div className="comment-list">
+        {loading && <p>Loading comments...</p>}
         {comments.length > 0 ? (
           comments.map((comment) => {
             return (
@@ -105,12 +138,17 @@ const CommentSection = ({ postId }) => {
                 </div>
                 {getUser().id === comment.commentedBy._id && (
                   <div>
-                    <button className="btn btn-sm btn-warning me-1" onClick={() => handleEditComment(comment._id,comment.text)}>
+                    <button
+                      className="btn btn-sm btn-warning me-1"
+                      onClick={() =>
+                        handleEditComment(comment._id, comment.text)
+                      }
+                    >
                       <FaEdit />
                     </button>
                     <button
                       className="btn btn-sm btn-danger"
-                      onClick={() => dispatch(deleteComment(comment._id))}
+                      onClick={() => handleDeleteComment(comment._id)}
                     >
                       <FaTrash />
                     </button>

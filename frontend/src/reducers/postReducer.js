@@ -64,15 +64,8 @@ export const updatePost = createAsyncThunk(
   "posts/updatePost",
   async ({ postId, postData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `http://localhost:3000/api/posts/edit/${postId}`,
-        postData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await api.put(`posts/edit/${postId}`, postData);
+     
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -80,7 +73,7 @@ export const updatePost = createAsyncThunk(
   }
 );
 
-// export const addPost = createAsyncThunk("http://localhost:3000/api/posts/create",async(postData,))
+
 const initialState = {
   posts: [],
   isLoading: false,
@@ -90,7 +83,9 @@ const initialState = {
 const postSlice = createSlice({
   name: "posts",
   initialState,
-  reducers: {},
+  reducers: {
+   
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchPosts.pending, (state) => {

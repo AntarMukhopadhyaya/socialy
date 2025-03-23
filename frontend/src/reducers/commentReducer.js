@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../api";
 
-export const fetchComments = createAsyncThunk(
-  "comments/fetch",
-  async (postId) => {
-    const response = await api.get(`comments/${postId}`);
-    return response.data;
-  }
-);
+// export const fetchComments = createAsyncThunk(
+//   "comments/fetch",
+//   async (postId) => {
+//     const response = await api.get(`comments/${postId}`);
+//     return response.data;
+//   }
+// );
 
 export const postComment = createAsyncThunk(
   "comments/post",
@@ -35,24 +35,31 @@ export const updateComment = createAsyncThunk(
 const commentSlice = createSlice({
   name: "comments",
   initialState: {
-    comments: [],
+    commentsByPosts: {},
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+ 
+    setComments: (state, action) => {
+      const { postId, comments } = action.payload;
+      state.commentsByPostId[postId] = comments || []; // Ensure it's always an array
+      console.log(state.commentsByPostId);
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchComments.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchComments.fulfilled, (state, action) => {
-        state.comments = action.payload;
-        state.loading = false;
-      })
-      .addCase(fetchComments.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
+      // .addCase(fetchComments.pending, (state) => {
+      //   state.loading = true;
+      // })
+      // .addCase(fetchComments.fulfilled, (state, action) => {
+      //   state.comments = action.payload;
+      //   state.loading = false;
+      // })
+      // .addCase(fetchComments.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.error = action.error.message;
+      // })
       .addCase(postComment.fulfilled, (state, action) => {
         state.comments.unshift(action.payload);
       })
@@ -68,4 +75,6 @@ const commentSlice = createSlice({
       });
   },
 });
+export const { clearComments,setComments } = commentSlice.actions;
+
 export default commentSlice.reducer;

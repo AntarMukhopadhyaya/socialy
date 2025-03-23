@@ -1,4 +1,5 @@
 import Comment from "../models/Comment.js";
+import Notification from "../models/Notification.js";
 import Post from "../models/Post.js";
 export const addComment = async (req, res) => {
   const { postId } = req.params;
@@ -7,10 +8,22 @@ export const addComment = async (req, res) => {
   if (!text)
     return res.status(400).json({ message: "Comment text is required" });
   try {
+    
     const comment = new Comment({ text, commentedBy: userId, post: postId });
     await comment.save();
-    await Post.findByIdAndUpdate(postId, { $push: { comments: comment._id } });
+    const post = await  Post.findByIdAndUpdate(postId, { $push: { comments: comment._id } });
+    const postOwner = post.postedBy;
     const populatedComment = await Comment.findById(comment._id).populate("commentedBy", "username profileImage");
+    const notification = new Notification({
+      userId: postOwner,
+      message: "Your post was commented on by the user " + req.user.username,
+    });
+    await notification.save();
+    const io = req.app.get("io");
+    io.to(postOwner).emit("notification", {
+      message: `Your post was commented on by user ${req.user.username}`,
+      postId,
+    });
     res.status(201).json(populatedComment);
   } catch (error) {
     console.error(error);

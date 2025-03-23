@@ -2,22 +2,40 @@ import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import Likes from "../models/Likes.js";
 import axios from "axios";
+import Notification from "../models/Notification.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 export const createPost = async (req, res) => {
-  const { content, userId,username } = req.body;
+  const { content, userId, username } = req.body;
   console.log(req.body);
- 
+
   let postedBy = {
     _id: userId,
     username: username,
   };
-  
+
   try {
-    const post = new Post({ content,postedBy , image: req.file  ?  req.file.filename : null});
+    const post = new Post({
+      content,
+      postedBy,
+      image: req.file ? req.file.filename : null,
+    });
     await post.save();
     const populatedPost = await Post.findById(post._id)
       .populate("postedBy", "username profileImage")
       .exec();
+    const notification = new Notification({
+      userId: userId,
+      message: "Your post has been successfully created!",
+    });
+    await notification.save();
+    const io = req.app.get("io");
+
+    io.emit("newPost", {
+      message: "Your post has been successfully created!",
+      post: post,
+    });
+
     res.status(201).json(populatedPost);
   } catch (err) {
     console.error(err);
@@ -29,8 +47,15 @@ export const getPosts = async (req, res) => {
   try {
     const posts = await Post.find()
       .populate("postedBy", "username profileImage ")
-      .populate("comments.commentedBy", "username")
-      .populate("likes").sort({ createdAt: -1 });
+      .populate({
+        path: "comments",
+        populate: {
+          path: "commentedBy",
+          select: "username profileImage",
+        },
+      })
+      .populate("likes")
+      .sort({ createdAt: -1 });
 
     const postsWithLikes = posts.map((post) => ({
       ...post.toObject(),
@@ -71,6 +96,8 @@ export const likePost = async (req, res) => {
     const { postId } = req.params;
     const userId = req.user.id;
     const existingLike = await Likes.findOne({ postId, userId });
+    const post = await Post.findById(postId);
+    if (!post) return res.status(404).json({ message: "Post not found" });
     if (existingLike) {
       await Likes.deleteOne({ postId, userId });
       await Post.findByIdAndUpdate(postId, {
@@ -79,6 +106,17 @@ export const likePost = async (req, res) => {
     } else {
       const like = await Likes.create({ postId, userId });
       await Post.findByIdAndUpdate(postId, { $push: { likes: like._id } });
+      const notification = new Notification({
+        userId: userId,
+        message: "Your post was liked by the user " + req.user.username,
+      });
+      await notification.save();
+      const io = req.app.get("io");
+      // Emit a socket event to the post owner
+      io.to(post.postedBy.toString()).emit("notification", {
+        message: `Your post was liked by user ${req.user.username}`,
+        postId,
+      });
     }
     const likesCount = await Likes.countDocuments({ postId });
     const hasLiked = !!(await Likes.findOne({ postId, userId }));
@@ -113,7 +151,10 @@ export const rewritePost = async (req, res) => {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const prompt = `Rewrite this social media post in a more engaging and creative way:\n\n"${content}`;
     const result = await model.generateContent(prompt);
-    const rewrittenContent = result.response.candidates?.[0]?.content?.parts?.map(p => p.text).join(" ") || "Failed to generate response";
+    const rewrittenContent =
+      result.response.candidates?.[0]?.content?.parts
+        ?.map((p) => p.text)
+        .join(" ") || "Failed to generate response";
 
     console.log(rewrittenContent);
 
@@ -123,7 +164,3 @@ export const rewritePost = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
-
-
