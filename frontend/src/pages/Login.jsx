@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Alert from "../components/Alert";
 import { useNavigate } from "react-router";
 import axios from "axios";
+
 const Login = () => {
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
@@ -39,46 +40,51 @@ const Login = () => {
   };
 
   return (
-    <main className=" d-flex align-items-center justify-content-center min-vh-100 py-3 ">
-      <div
-        className="card shadow-lg p-3 mb-5 bg-white rounded"
-        style={{ width: "30rem" }}
-      >
-        <Alert message={errorMessage} type="danger" onClose={() => setErrorMessage("")} />
-        <Alert message={successMessage} type="success" onClose={() => setSuccessMessage("")} />
-        <div className="card-header">
-          <h5 className="card-title">Login to your Account</h5>
-        </div>
-        <div className="card-body ">
+    <main className="d-flex align-items-center justify-content-center min-vh-100 py-3 bg-light">
+      <div className="card shadow border-0 rounded-4" style={{ width: "28rem" }}>
+        <div className="card-body p-4">
+          <div className="text-center mb-4">
+            <h4 className="fw-bold">Welcome Back!</h4>
+            <p className="text-muted">Login to continue</p>
+          </div>
+          <Alert message={errorMessage} type="danger" onClose={() => setErrorMessage("")} />
+          <Alert message={successMessage} type="success" onClose={() => setSuccessMessage("")} />
           <form onSubmit={handleSubmit}>
-            <div className="form-group my-2">
-              <label className="form-label" htmlFor="email">
-                Email*
-              </label>
+            <div className="mb-3">
+              <label className="form-label" htmlFor="email">Email Address</label>
               <input
                 type="email"
                 className="form-control form-control-lg"
-                placeholder="Enter your Email..."
+                placeholder="Enter your email"
                 required
-                value = {formData.email}
-                onChange = {(e) => setFormData({...formData,email:e.target.value})}
-              />
-            </div>
-            <div className="form-group my-2">
-              <label className="form-label" htmlFor="password">
-                Password*
-              </label>
-              <input
-                className="form-control form-control-lg"
-                type="password"
-                placeholder="Enter your Password..."
-                required
-                value = {formData.password}
-                onChange = {(e) => setFormData({...formData,password:e.target.value})}
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
 
-            <button className="btn btn-outline-primary btn-lg" type="submit" disabled={loading}>{loading ? "Loading" : "Login"}</button>
+            <div className="mb-3">
+              <label className="form-label" htmlFor="password">Password</label>
+              <input
+                type="password"
+                className="form-control form-control-lg"
+                placeholder="Enter your password"
+                required
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              />
+            </div>
+
+            <div className="d-flex justify-content-between mb-4">
+              <a href="/register" className="text-decoration-none">Register here</a>
+            </div>
+
+            <button
+              className="btn btn-primary btn-lg w-100"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Login"}
+            </button>
           </form>
         </div>
       </div>
