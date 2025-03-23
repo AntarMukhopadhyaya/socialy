@@ -23,6 +23,9 @@ const PostCard = ({ post }) => {
   const [showComments, setShowComments] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editedContent, setEditedContent] = useState(post.content);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const currentURL = `${window.location.origin}/#${post._id}`;
+
   const { getUser } = useAuth();
   const dispatch = useDispatch();
   const handlEdit = () => {
@@ -35,10 +38,14 @@ const PostCard = ({ post }) => {
     ).then(() => dispatch(fetchPosts()));
     setShowEditModal(false);
   };
-  console.log(post)
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(currentURL);
+    alert("Link copied to clipboard!");
+  };
+  console.log(post);
 
   return (
-    <div className="card mb-4 shadow-sm">
+    <div className="card mb-4 shadow-sm" id={post._id}>
       <div className="card-body">
         <div className="d-flex justify-content-between ">
           <div className="d-flex justify-content-start align-items-center gap-2">
@@ -100,7 +107,6 @@ const PostCard = ({ post }) => {
         </div>
         {post.image && (
           <div className="text-center mb-3">
-
             <img
               src={`http://localhost:3000/uploads/${post.image}`}
               alt="post image"
@@ -110,26 +116,29 @@ const PostCard = ({ post }) => {
           </div>
         )}
         <p>{post.content}</p>
-        <div className="d-flex justify-content-start">
+        <div className="d-flex justify-content-start gap-2">
           <button
-            className="btn btn-link btn-md"
+            className={`btn btn-md ${post.hasLiked ? "btn-primary" : "btn-outline-primary"}`}
+
             onClick={() => dispatch(likePost(post._id))}
           >
             <FaThumbsUp color={post.hasLiked ? "blue" : "black"} />{" "}
             {post.likesCount}
           </button>
           <button
-            className="btn btn-md"
+            className={`btn btn-md ${showComments ? "btn-primary" : "btn-outline-secondary"}`}
             onClick={() => setShowComments(!showComments)}
           >
             <FaComment color={showComments ? "blue" : "black"} />{" "}
             {post.comments.length}
           </button>
-          {/* <button className="btn btn-link btn-md">
-            <FaShareAlt /> Share
-          </button>{" "} */}
+          <button className="btn btn-outline-secondary btn-md" onClick={() => setShowShareModal((prev) => !prev)}>
+            <FaShareAlt  /> 
+          </button>{" "}
         </div>
-        {showComments && <CommentSection postId={post._id} comments={post.comments} />}
+        {showComments && (
+          <CommentSection postId={post._id} comments={post.comments} />
+        )}
       </div>
 
       <div
@@ -174,6 +183,38 @@ const PostCard = ({ post }) => {
           </div>
         </div>
       </div>
+      <div
+        className={`modal fade ${showShareModal ? "show d-block" : ""}`}
+        tabIndex="-1"
+      >
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Share Post</h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowShareModal(false)}
+              ></button>
+            </div>
+            <div className="modal-body">
+              <input
+                type="text"
+                className="form-control"
+                value={currentURL}
+                readOnly
+              />
+              <button
+                className="btn btn-primary mt-3"
+                onClick={copyToClipboard}
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {showShareModal && <div className="modal-backdrop fade show"></div>}
 
       {showEditModal && <div className="modal-backdrop fade show"></div>}
     </div>
