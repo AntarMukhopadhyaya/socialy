@@ -3,7 +3,7 @@ import Alert from "../components/Alert";
 import { useNavigate } from "react-router";
 import axios from "axios";
 const Login = () => {
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ const Login = () => {
       }
       console.log(response.data);
       localStorage.setItem("token", response.data.token);
-      naviagte("/");
+      navigate("/");
     } catch (err) {
       setErrorMessage(err.message);
     } finally {

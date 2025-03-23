@@ -27,7 +27,7 @@ const Sidebar = () => {
 
   return (
     <div className="sticky-top">
-      <div className="card mb-4">
+      {/* <div className="card mb-4">
         <div className="card-body">
           <h5>Your Activity</h5>
           <ul className="list-unstyled">
@@ -42,7 +42,7 @@ const Sidebar = () => {
             </li>
           </ul>
         </div>
-      </div>
+      </div> */}
       <div className="card">
         <div className="card-body">
           <h5>Suggestions</h5>
